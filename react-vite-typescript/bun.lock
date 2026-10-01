@@ -5,7 +5,7 @@
     "": {
       "name": "advertiser-sdk-examples",
       "dependencies": {
-        "@specify-sh/advertiser-sdk": "file:../specify-sdks/packages/advertiser-sdk",
+        "@specify-sh/advertiser-sdk": "file:../../specify-sdks/packages/advertiser-sdk",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
       },
@@ -173,7 +173,7 @@
 
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.63.6", "", { "os": "win32", "cpu": "x64" }, "sha512-0RAxO1pS/6lY1mSoD2Apm+6aPyfUlm+OWKgncIdj/eVN9I+pDY3lKgD7xsUNFei1u7MZQETGOo6m8POXMDp53A=="],
 
-    "@specify-sh/advertiser-sdk": ["@specify-sh/advertiser-sdk@file:../specify-sdks/packages/advertiser-sdk", {}],
+    "@specify-sh/advertiser-sdk": ["@specify-sh/advertiser-sdk@file:../../specify-sdks/packages/advertiser-sdk", {}],
 
     "@types/babel__core": ["@types/babel__core@7.20.5", "", { "dependencies": { "@babel/parser": "^7.20.7", "@babel/types": "^7.20.7", "@types/babel__generator": "*", "@types/babel__template": "*", "@types/babel__traverse": "*" } }, "sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA=="],
 

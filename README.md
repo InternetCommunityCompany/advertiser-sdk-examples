@@ -10,11 +10,13 @@ Use Bun, with these repositories next to each other:
 ```text
 specify-sdks/
 advertiser-sdk-examples/
+  react-vite-typescript/
 ```
 
-From this repository:
+First run `bun install` in `specify-sdks`. Then, from this repository:
 
 ```sh
+cd react-vite-typescript
 bun run sdk:build
 bun install
 bun run dev
@@ -26,7 +28,7 @@ Open the URL printed by Vite. The page should display `SDK health: true`.
 ## Development loop
 
 1. Edit `specify-sdks/packages/advertiser-sdk`.
-2. Run `bun run sdk:build` here.
+2. Run `bun run sdk:build` inside `react-vite-typescript/`.
 3. Reload the example page.
 
 The local dependency links to the SDK package. Its public exports resolve to
@@ -35,7 +37,7 @@ The app imports `@specify-sh/advertiser-sdk`; it does not import SDK source file
 
 If Vite serves an older build, restart it with `bun run dev --force` and reload.
 
-To check the example's types and production build:
+To check the example's types and production build, inside `react-vite-typescript/`:
 
 ```sh
 bun run build
