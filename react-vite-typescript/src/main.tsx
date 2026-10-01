@@ -1,13 +1,13 @@
-import { health } from "@specify-sh/advertiser-sdk";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import App from "./App";
+import { Web3Provider } from "./components/web3-provider";
+import "./index.css";
 
-function App() {
-  return (
-    <main>
-      <h1>Advertiser SDK example</h1>
-      <p>SDK health: {String(health())}</p>
-    </main>
-  );
-}
-
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <Web3Provider>
+      <App />
+    </Web3Provider>
+  </StrictMode>,
+);
