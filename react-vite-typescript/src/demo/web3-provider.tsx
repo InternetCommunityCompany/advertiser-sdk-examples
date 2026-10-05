@@ -22,7 +22,18 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             appName: "Specify Advertiser SDK React-Vite Demo",
             walletConnectProjectId: projectId,
           })
-        : { ...options, connectors: [injected()] },
+        : {
+            ...options,
+            connectors: [
+              injected({
+                target: {
+                  id: "injected",
+                  name: "Browser Wallet",
+                  provider: (browserWindow) => browserWindow?.ethereum,
+                },
+              }),
+            ],
+          },
     );
   });
   const [queryClient] = useState(() => new QueryClient());
