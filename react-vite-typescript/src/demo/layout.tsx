@@ -9,7 +9,7 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-gray-900 text-white">
       <TopBar />
       <main className="mx-auto max-w-7xl px-4 py-8">
-        <section className="mx-auto max-w-3xl rounded-2xl border border-gray-700/50 bg-gradient-to-br from-gray-800 to-gray-900 p-8 shadow-2xl">
+        <section className="mx-auto max-w-3xl rounded-2xl border border-gray-700/50 bg-gradient-to-br from-gray-800 to-gray-900 p-5 shadow-2xl sm:p-8">
           <h2 className="text-2xl font-bold">
             {isConnected
               ? "Wallet connected"
@@ -37,7 +37,7 @@ export function Layout({ children }: { children: ReactNode }) {
               wallets and the current URL only while consent is granted.
             </p>
 
-            <div className="mt-4 flex flex-wrap items-end gap-3 [&>button]:rounded-lg [&>button]:bg-blue-600 [&>button]:px-4 [&>button]:py-2 [&>button:hover]:bg-blue-500">
+            <div className="mt-6 space-y-5">
               {children}
             </div>
           </div>

@@ -2,18 +2,13 @@ import { useEffect, useState } from "react";
 import * as CookieConsent from "vanilla-cookieconsent";
 import "vanilla-cookieconsent/dist/cookieconsent.css";
 
-export function CookieConsentControl({
-  onConsentChange,
-}: {
-  onConsentChange: (granted: boolean) => void;
-}) {
+export function CookieConsentControl() {
   const [consent, setConsent] = useState(false);
 
   useEffect(() => {
     const syncConsent = () => {
       const granted = CookieConsent.acceptedCategory("analytics");
       setConsent(granted);
-      onConsentChange(granted);
     };
 
     void CookieConsent.run({
@@ -61,19 +56,25 @@ export function CookieConsentControl({
     });
 
     return () => {
-      onConsentChange(false);
       CookieConsent.reset();
     };
-  }, [onConsentChange]);
+  }, []);
 
   return (
-    <div>
-      <p className="mb-4">
-        Capture consent: {consent ? "granted" : "refused"}
-      </p>
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <span
+        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${
+          consent
+            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+            : "border-amber-400/20 bg-amber-400/10 text-amber-300"
+        }`}
+      >
+        <span aria-hidden="true" className="h-2 w-2 rounded-full bg-current" />
+        {consent ? "Consent granted" : "Consent not granted"}
+      </span>
       <button
         type="button"
-        className="rounded-lg border border-gray-600 px-4 py-2 hover:bg-gray-700"
+        className="rounded-lg border border-gray-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-400"
         onClick={() => CookieConsent.showPreferences()}
       >
         Cookie preferences
