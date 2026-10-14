@@ -1,25 +1,29 @@
-import type { CaptureResult } from "@specify-sh/advertiser-sdk";
+import Specify from "@specify-sh/advertiser-sdk";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { CookieConsentControl } from "./demo/cookie-consent";
 import { Layout } from "./demo/layout";
-import { specify } from "./specify";
 
 export default function App() {
   const { address, isConnected } = useAccount();
-
+  const [specify] = useState(
+    () =>
+      new Specify({
+        advertiserKey: import.meta.env.VITE_SPECIFY_ADVERTISER_KEY ?? "",
+      })
+  );
   const [isCapturing, setIsCapturing] = useState(false);
-  const [result, setResult] = useState<CaptureResult | null>(null);
+  const [result, setResult] = useState<number | null>();
 
   useEffect(() => {
     if (isConnected && address) {
-      specify.identify(address);
+      void specify.identify(address);
     }
-  }, [address, isConnected]);
+  }, [address, isConnected, specify]);
 
   async function handleOnClick() {
     setIsCapturing(true);
-    setResult(null);
+    setResult(undefined);
     try {
       setResult(await specify.capture("example_event"));
     } finally {
@@ -29,13 +33,14 @@ export default function App() {
 
   return (
     <Layout>
-      <CookieConsentControl />
-
+      <CookieConsentControl client={specify} />
       <div className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 className="font-semibold">Try an event capture</h3>
-            <p className="mt-1 font-mono text-xs text-gray-400">example_event</p>
+            <p className="mt-1 font-mono text-xs text-gray-400">
+              example_event
+            </p>
           </div>
           <button
             type="button"
@@ -59,28 +64,20 @@ export default function App() {
           className="mt-4 border-t border-gray-700/60 pt-4 text-sm"
         >
           {isCapturing ? (
-            <p className="text-gray-300">Waiting for capture confirmation…</p>
-          ) : result ? (
-            <div className={result.success ? "text-emerald-300" : "text-rose-300"}>
-              <p className="flex items-center gap-2 font-medium">
-                <span aria-hidden="true">{result.success ? "✓" : "!"}</span>
-                {result.success ? "Capture confirmed" : "Capture unsuccessful"}
-              </p>
-              {!result.success && (
-                <>
-                  <p className="mt-1 break-words text-gray-300">{result.error}</p>
-                  {result.details?.map((detail) => (
-                    <p key={detail.field} className="mt-1 break-words text-gray-400">
-                      {detail.field}: {detail.message}
-                    </p>
-                  ))}
-                </>
-              )}
-            </div>
-          ) : (
+            <p className="text-gray-300">Waiting for the SDK response…</p>
+          ) : result === undefined ? (
             <p className="text-gray-400">
               Capture an event to check your integration.
             </p>
+          ) : result === 200 ? (
+            <p className="font-medium text-emerald-300">Event accepted.</p>
+          ) : result === null ? (
+            <p className="text-gray-300">
+              No HTTP response. Before consent, events are buffered until you
+              grant it.
+            </p>
+          ) : (
+            <p className="text-rose-300">Capture returned HTTP {result}.</p>
           )}
         </div>
       </div>

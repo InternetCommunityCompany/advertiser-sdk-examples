@@ -1,15 +1,21 @@
+import type Specify from "@specify-sh/advertiser-sdk";
 import { useEffect, useState } from "react";
 import * as CookieConsent from "vanilla-cookieconsent";
 import "vanilla-cookieconsent/dist/cookieconsent.css";
 
-export function CookieConsentControl() {
+export function CookieConsentControl({ client }: { client: Specify }) {
   const [consent, setConsent] = useState(false);
 
   useEffect(() => {
     const syncConsent = () => {
-      const granted = CookieConsent.acceptedCategory("analytics");
+      const granted =
+        CookieConsent.validConsent() &&
+        CookieConsent.acceptedCategory("analytics");
       setConsent(granted);
+      client.setCookieConsent(granted);
     };
+
+    syncConsent();
 
     void CookieConsent.run({
       categories: {
@@ -25,7 +31,7 @@ export function CookieConsentControl() {
             consentModal: {
               title: "Allow Specify event capture?",
               description:
-                "With your consent, capturing an event sends remembered wallet addresses and the current page URL to Specify and allows an identity cookie.",
+                "With your consent, Specify sends remembered wallet addresses and the current page URL and can set an identity cookie.",
               acceptAllBtn: "Allow capture",
               acceptNecessaryBtn: "Refuse capture",
               showPreferencesBtn: "Cookie preferences",
@@ -56,9 +62,10 @@ export function CookieConsentControl() {
     });
 
     return () => {
+      client.setCookieConsent(false);
       CookieConsent.reset();
     };
-  }, []);
+  }, [client]);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">

@@ -32,14 +32,12 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <div className="mt-6 border-t border-gray-700/50 pt-6">
             <p className="mt-2 text-sm leading-relaxed text-gray-400">
-              Connected wallets are remembered locally by the SDK, including account
-              changes. Disconnecting does not clear them. Captures send remembered
-              wallets and the current URL only while consent is granted.
+              Connected wallets are remembered locally by the SDK, including
+              account changes. Disconnecting does not clear them. Calls before
+              consent stay in memory and are sent after consent is granted.
             </p>
 
-            <div className="mt-6 space-y-5">
-              {children}
-            </div>
+            <div className="mt-6 space-y-5">{children}</div>
           </div>
         </section>
       </main>
