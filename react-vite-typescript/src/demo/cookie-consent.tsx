@@ -8,14 +8,10 @@ export function CookieConsentControl({ client }: { client: Specify }) {
 
   useEffect(() => {
     const syncConsent = () => {
-      const granted =
-        CookieConsent.validConsent() &&
-        CookieConsent.acceptedCategory("analytics");
+      const granted = CookieConsent.acceptedCategory("analytics");
       setConsent(granted);
       client.setCookieConsent(granted);
     };
-
-    syncConsent();
 
     void CookieConsent.run({
       categories: {
