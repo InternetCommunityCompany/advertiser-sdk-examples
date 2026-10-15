@@ -1,0 +1,7 @@
+.next/
+out/
+*.tsbuildinfo
+.env.*
+!.env.example
+local-evidence/
+AGENTS.md
