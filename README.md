@@ -1,76 +1,73 @@
 # advertiser-sdk-examples
 
-One browser-only React + Vite + TypeScript example, based on the React example in
-[specify-publisher-sdk-examples](https://github.com/InternetCommunityCompany/specify-publisher-sdk-examples).
+TypeScript integrations of the advertiser SDK for React + Vite, Next.js, and Node.js. 
 
-## Setup
+## Run the React + Vite example
 
-Use Bun, with these repositories next to each other:
+Keep this checkout beside `specify-sdks`. The dependency currently links to the
+local SDK package so the example uses the new API before its release.
 
-```text
-specify-sdks/
-advertiser-sdk-examples/
-  react-vite-typescript/
+```sh
+cd ../specify-sdks
+bun install
+cd ../advertiser-sdk-examples/react-vite-typescript
+bun install
+bun run sdk:build
+cp .env.example .env.local
 ```
 
-First run `bun install` in `specify-sdks`. Then, from this repository:
+Set `VITE_SPECIFY_ADVERTISER_KEY` to your organization's advertiser key, then run
+`bun run dev` and open the URL printed by Vite. Injected browser wallets work
+without further configuration. Set the optional `VITE_WALLETCONNECT_PROJECT_ID`
+to enable WalletConnect QR/mobile connections.
+
+Vite variables are public browser configuration. Keep private service credentials
+out of this app.
+
+## Integration
+
+[App.tsx](react-vite-typescript/src/App.tsx) creates one SDK instance per mounted
+app and identifies the address supplied by wagmi when the connected account changes:
+
+```ts
+const specify = new Specify({ advertiserKey: yourAdvertiserKey });
+await specify.identify(connectedAddress);
+const status = await specify.capture("example_event");
+```
+
+[cookie-consent.tsx](react-vite-typescript/src/demo/cookie-consent.tsx) connects
+[CookieConsent's callbacks](https://cookieconsent.orestbida.com/reference/configuration-reference.html)
+to `specify.setCookieConsent(granted)` on initialization and whenever the saved
+choice changes. Before consent, identification and events stay in instance memory;
+granting consent sends them. Withdrawing consent pauses unsent requests.
+Connected wallets accumulate; disconnecting does not clear them.
+
+The SDK returns an HTTP status or `null`. This example displays `200` as accepted,
+other statuses as returned, and explains that calls before consent are buffered.
+See the [SDK documentation](../specify-sdks/packages/advertiser-sdk/README.md) for
+user IDs, identity reset, event overrides, and server usage.
+
+The surrounding wallet providers and styling are demo scaffolding. The SDK uses
+neither wagmi nor React itself.
+
+## Check
 
 ```sh
 cd react-vite-typescript
-bun run sdk:build
-bun install
-bun run dev
-```
-
-Open the URL printed by Vite. The page should display `SDK health: true`.
-`health()` is a local import check; it makes no network requests and needs no edge server.
-
-## Wallets and styling
-
-The React example mirrors the publisher demo's wagmi v2, React Query, and
-ConnectKit providers, wallet button in the header, and dark Tailwind layout.
-Provider state belongs to the mounted app. React 18 matches ConnectKit's declared
-peer dependencies.
-
-Browser wallets work without environment variables. To enable WalletConnect
-QR/mobile connections, copy `react-vite-typescript/.env.example` to
-`react-vite-typescript/.env.local`, set `VITE_WALLETCONNECT_PROJECT_ID` to your
-project ID from [WalletConnect](https://cloud.walletconnect.com), and restart Vite.
-Vite environment variables are public browser configuration; do not put secrets
-in them.
-
-The connected address comes from wagmi and updates on account changes or
-disconnect. Wagmi's persistent wallet storage is disabled. WalletConnect manages
-its own connection session when enabled.
-
-The advertiser SDK currently exports only `health()`. This example does not send
-the wallet to Specify, identify visitors, or track conversions. Those flows need
-the advertiser SDK's public API first; the publisher's `serve()` and ad rendering
-do not apply here.
-
-## Development loop
-
-1. Edit `specify-sdks/packages/advertiser-sdk`.
-2. Run `bun run sdk:build` inside `react-vite-typescript/`.
-3. Reload the example page.
-
-The local dependency links to the SDK package. Its public exports resolve to
-compiled `dist` files, so SDK changes must be built before they reach the example.
-The app imports `@specify-sh/advertiser-sdk`; it does not import SDK source files.
-
-If Vite serves an older build, restart it with `bun run dev --force` and reload.
-
-To check the example's types and production build, inside `react-vite-typescript/`:
-
-```sh
 bun run build
 ```
 
-Run the SDK repository's checks there before finishing SDK changes:
+## Next.js + TypeScript example
 
-```sh
-bun run check
-bun run types
-bun run test
-bun run build
-```
+[nextjs-typescript](nextjs-typescript/README.md) demonstrates browser capture and
+a server-side purchase with the App Router. Both flows use `customer_123` and
+`NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY`. It includes CookieConsent synchronization,
+a Node.js Server Action, and setup and build instructions.
+
+## Node.js + TypeScript example
+
+[nodejs-typescript](nodejs-typescript/README.md) shows a server business operation
+that captures a `purchase` event for an explicit customer ID. It uses the same
+public default import and local SDK dependency, builds TypeScript as ESM, and
+runs the compiled example with Node.js. Its README includes setup, commands,
+optional identification, explicit URLs, and tracking failure handling.
