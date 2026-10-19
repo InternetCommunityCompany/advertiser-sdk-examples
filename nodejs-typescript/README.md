@@ -6,16 +6,11 @@ Node.js executes the compiled JavaScript. Use Node.js 22 or newer and Bun.
 
 ## Setup and run
 
-Keep `advertiser-sdk-examples` beside `specify-sdks`. This example follows the
-React example's local dependency convention:
-`file:../../specify-sdks/packages/advertiser-sdk`.
+This example installs `@specify-sh/advertiser-sdk@latest` from npm.
 
 ```sh
-cd ../specify-sdks
+cd nodejs-typescript
 bun install
-cd ../advertiser-sdk-examples/nodejs-typescript
-bun install
-bun run sdk:build
 cp .env.example .env.local
 ```
 
@@ -36,10 +31,6 @@ Supply your application's customer ID as the first argument:
 ```sh
 node --env-file=.env.local dist/index.js customer_456
 ```
-
-Re-run `bun run sdk:build` after changing the SDK checkout, then type-check and
-build this example again. The installed dependency uses the SDK's compiled
-public default export. Its service endpoint comes from that SDK build.
 
 ## The SDK integration
 
@@ -99,6 +90,6 @@ The purchase completes before tracking. This example logs the tracking result
 and returns the completed purchase regardless of that result. Do not turn a
 tracking status or `null` into a failed checkout or roll back the purchase.
 
-See the [SDK README](../../specify-sdks/packages/advertiser-sdk/README.md) for the
+See the [SDK README](https://www.npmjs.com/package/@specify-sh/advertiser-sdk) for the
 full API. Internal verification and infrastructure tools belong in
 `advertiser-sdk-playground`.

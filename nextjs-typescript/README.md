@@ -27,19 +27,12 @@ The example scaffolding lives in `demo/`, following the React example:
 
 ## Setup and configuration
 
-Requires Node.js 20.9+ and Bun. Keep this checkout beside `specify-sdks`; the
-`file:../../specify-sdks/packages/advertiser-sdk` dependency uses its compiled
-public package exports.
-
-The scripts use Next.js's supported Webpack option because Turbopack currently
-fails to read Bun's linked local package manifest in this setup.
+Requires Node.js 20.9+ and Bun. Installs
+`@specify-sh/advertiser-sdk@latest` from npm.
 
 ```sh
-cd ../specify-sdks
+cd nextjs-typescript
 bun install
-cd ../advertiser-sdk-examples/nextjs-typescript
-bun install
-bun run sdk:build
 cp .env.example .env.local
 ```
 
@@ -59,8 +52,7 @@ bun run start
 ```
 
 Open [localhost:3001](http://localhost:3001). For development, use `bun run dev`
-instead of `build` and `start`. After changing the SDK, run `bun run sdk:build`
-again and restart development, or rebuild and restart production. Rebuild after
+instead of `build` and `start`. Rebuild after
 changing public variables or the customer ID; the page is prerendered with that ID.
 
 ## Browser capture
@@ -91,8 +83,9 @@ const status = await specify.capture("product_view");
 
 The current SDK starts with consent false. Identification remembers the customer
 locally, and captures before consent return `null` immediately and buffer a
-snapshot in instance memory. Granting consent sends the pending identification
-first, then buffered captures in order. Withdrawal pauses unsent work. Reloading
+snapshot in instance memory. Granting consent sends pending identification and
+flushes buffered captures in order without waiting for identification. Withdrawal
+pauses unsent work. Reloading
 or discarding the instance loses its buffer. The original buffered result stays
 `null`; it does not become a delivery receipt later.
 
@@ -138,7 +131,7 @@ local rejection, missing configuration, a network failure, or no response.
 Neither an HTTP status nor `null` by itself proves whether an event was stored.
 The SDK attempts each request once and does not provide durable retries.
 
-See the [SDK documentation](../../specify-sdks/packages/advertiser-sdk/README.md)
+See the [SDK documentation](https://www.npmjs.com/package/@specify-sh/advertiser-sdk)
 for the complete contract, and Next.js's official guides for
 [installation](https://nextjs.org/docs/app/getting-started/installation),
 [Server Action forms](https://nextjs.org/docs/app/guides/forms), and

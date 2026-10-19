@@ -5,7 +5,7 @@
     "": {
       "name": "nodejs-typescript",
       "dependencies": {
-        "@specify-sh/advertiser-sdk": "file:../../specify-sdks/packages/advertiser-sdk",
+        "@specify-sh/advertiser-sdk": "latest",
       },
       "devDependencies": {
         "@types/node": "^22",
@@ -14,7 +14,7 @@
     },
   },
   "packages": {
-    "@specify-sh/advertiser-sdk": ["@specify-sh/advertiser-sdk@file:../../specify-sdks/packages/advertiser-sdk", { "dependencies": { "@specify-sh/core": "0.1.0" } }],
+    "@specify-sh/advertiser-sdk": ["@specify-sh/advertiser-sdk@0.2.0", "", { "dependencies": { "@specify-sh/core": "0.1.0" } }, "sha512-rr+qlCTPAngCSYaabBJNwIgDEMWM3krWRMaXeD7CiD/fn1hZNNIpogwGURM6sXRNe4Z1SkDJhZQTJfijkp1VHA=="],
 
     "@specify-sh/core": ["@specify-sh/core@0.1.0", "", {}, "sha512-q8R4KHDONDSa87FYXsV0/3mvYA9Ao34T+LUoQPGjz1NmxCju9Weow5a8cbmc4WfVahm79MCPcXVlp4ckPVy3mg=="],
 

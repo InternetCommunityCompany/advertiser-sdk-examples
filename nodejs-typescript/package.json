@@ -8,13 +8,12 @@
     "node": ">=22"
   },
   "scripts": {
-    "sdk:build": "bun run --cwd ../../specify-sdks build --filter=@specify-sh/advertiser-sdk",
     "types": "tsc --noEmit",
     "build": "tsc",
     "start": "node --env-file=.env.local dist/index.js"
   },
   "dependencies": {
-    "@specify-sh/advertiser-sdk": "file:../../specify-sdks/packages/advertiser-sdk"
+    "@specify-sh/advertiser-sdk": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

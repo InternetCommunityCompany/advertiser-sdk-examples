@@ -9,13 +9,12 @@
   },
   "scripts": {
     "dev": "next dev --webpack --port 3001",
-    "sdk:build": "bun run --cwd ../../specify-sdks build --filter=@specify-sh/advertiser-sdk",
     "types": "next typegen && tsc --noEmit",
     "build": "next build --webpack",
     "start": "next start --port 3001"
   },
   "dependencies": {
-    "@specify-sh/advertiser-sdk": "file:../../specify-sdks/packages/advertiser-sdk",
+    "@specify-sh/advertiser-sdk": "latest",
     "next": "16.4.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
