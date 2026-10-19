@@ -33,8 +33,8 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="mt-6 border-t border-gray-700/50 pt-6">
             <p className="mt-2 text-sm leading-relaxed text-gray-400">
               The SDK identifies each wallet you connect, and forgets them when
-              you disconnect. Events wait until you answer the cookie banner;
-              if you refuse, they're still sent, without Specify's cookie.
+              you disconnect. Before you connect one, events wait for your
+              cookie choice, and are dropped if you refuse.
             </p>
 
             <div className="mt-6 space-y-5">{children}</div>

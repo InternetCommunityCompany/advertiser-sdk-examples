@@ -25,6 +25,6 @@ Set `NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY` in `.env.local`. Advertiser keys are pu
 
 ## What to expect
 
-- Browser events wait until you answer the cookie banner. If you refuse, they're still sent, without Specify's cookie.
+- The customer is identified, so browser events go out straight away. The cookie banner decides only whether Specify's cookie comes along.
 - With a development key, requests to `spfsrv.com/v1/identify` and `spfsrv.com/v1/events` return `200` in your browser's network panel. Development keys never record anything.
 - If the key is missing or invalid, the purchase still completes and shows why it wasn't sent to Specify. The server entry throws `ValidationError` for invalid input, and never fails because Specify is unreachable.

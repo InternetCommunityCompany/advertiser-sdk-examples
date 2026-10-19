@@ -1,7 +1,5 @@
 import * as CookieConsent from "vanilla-cookieconsent";
 
-// A stand-in for your consent manager: CookieConsent calls onConsent with the
-// stored answer on every page load, and onChange when the visitor changes it.
 export function watchAdvertisingConsent(onAnswer: (granted: boolean) => void) {
   const answer = () => onAnswer(CookieConsent.acceptedCategory("advertising"));
 

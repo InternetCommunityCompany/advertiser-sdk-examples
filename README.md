@@ -30,6 +30,6 @@ The integration is three small files:
 
 ## Check it works
 
-Use a development key. Answer the cookie banner, then capture an event: in your browser's network panel, requests to `spfsrv.com/v1/identify` and `spfsrv.com/v1/events` return `200`. Development keys never record anything.
+Use a development key. Connect a wallet and capture an event: in your browser's network panel, requests to `spfsrv.com/v1/identify` and `spfsrv.com/v1/events` return `200`. Development keys never record anything.
 
-Events wait until the visitor answers the banner. If they refuse, events are still sent, without Specify's cookie.
+The cookie banner decides only whether Specify's cookie is used. Before you connect a wallet, events wait for your answer, and are dropped if you refuse.

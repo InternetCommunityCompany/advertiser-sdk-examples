@@ -16,9 +16,8 @@ export function BrowserCapture() {
     <section className="flow" aria-labelledby="browser-title">
       <h2 id="browser-title">1. Capture in the browser</h2>
       <p>
-        Browser events carry the customer ID and the current page URL. They wait
-        until you answer the cookie banner; if you refuse, they&apos;re still
-        sent, without Specify&apos;s cookie.
+        Browser events carry the customer ID and the current page URL. Your
+        cookie choice decides only whether Specify&apos;s cookie comes along.
       </p>
       <div className="consent-row">
         <button
