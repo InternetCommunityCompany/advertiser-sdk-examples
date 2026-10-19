@@ -1,11 +1,11 @@
 "use server";
 
-import Specify from "@specify-sh/advertiser-sdk";
+import { capture, ValidationError } from "@specify-sh/advertiser-sdk/server";
 import { getCustomerId } from "../demo/customer";
 
 export type PurchaseResult = {
   purchaseId: string;
-  trackingStatus: number | null;
+  trackingError?: string;
 };
 
 export async function completePurchase(
@@ -14,10 +14,17 @@ export async function completePurchase(
   const customerId = getCustomerId();
   const purchaseId = crypto.randomUUID();
 
-  const specify = new Specify({
-    advertiserKey: process.env.NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY ?? "",
-  });
-  const trackingStatus = await specify.capture("purchase", customerId);
+  try {
+    await capture({
+      advertiserKey: process.env.NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY ?? "",
+      event: "purchase",
+      identity: customerId,
+      dedupeKey: purchaseId,
+    });
+  } catch (error) {
+    if (!(error instanceof ValidationError)) throw error;
+    return { purchaseId, trackingError: error.message };
+  }
 
-  return { purchaseId, trackingStatus };
+  return { purchaseId };
 }

@@ -1,11 +1,16 @@
 # advertiser-sdk-examples
 
-TypeScript integrations of the advertiser SDK for React + Vite, Next.js, and Node.js. 
+Working examples of the [Specify advertiser SDK](https://www.npmjs.com/package/@specify-sh/advertiser-sdk). Each one is a guide from [docs.specify.sh](https://docs.specify.sh/advertising/track-conversions) as a running app.
 
-## Run the React + Vite example
+| Example | Guide | What it shows |
+| --- | --- | --- |
+| [react-vite-typescript](react-vite-typescript) | [React](https://docs.specify.sh/advertising/react) | Consent, wallet identity and a browser conversion |
+| [nextjs-typescript](nextjs-typescript) | [Next.js](https://docs.specify.sh/advertising/nextjs) | Consent and identity from the root layout, a browser conversion, and a server conversion from a Server Action |
+| [nodejs-typescript](nodejs-typescript) | [Server events](https://docs.specify.sh/advertising/server) | A server conversion with a dedupe key, and handling `ValidationError` |
 
-All three examples use `@specify-sh/advertiser-sdk@latest` from npm. Lockfiles
-record the installed version; refresh them and rerun checks after each SDK release.
+All three install `@specify-sh/advertiser-sdk@latest`. The lockfiles record the installed version; refresh them after each SDK release.
+
+## Run the React example
 
 ```sh
 cd react-vite-typescript
@@ -13,61 +18,18 @@ bun install
 cp .env.example .env.local
 ```
 
-Set `VITE_SPECIFY_ADVERTISER_KEY` to your organization's advertiser key, then run
-`bun run dev` and open the URL printed by Vite. Injected browser wallets work
-without further configuration. Set the optional `VITE_WALLETCONNECT_PROJECT_ID`
-to enable WalletConnect QR/mobile connections.
+Set `VITE_SPECIFY_ADVERTISER_KEY` to an advertiser key from your Specify dashboard, then run `bun run dev` and open the URL Vite prints. Browser wallets work as they are; set the optional `VITE_WALLETCONNECT_PROJECT_ID` to add WalletConnect.
 
-Development keys validate requests without storing events or identities or
-setting Specify identity cookies. Successful requests return HTTP `200`.
+The integration is three small files:
 
-Vite variables are public browser configuration. Keep private service credentials
-out of this app.
+- [lib/specify.ts](react-vite-typescript/src/lib/specify.ts) creates one client for the whole app.
+- [components/consent-bridge.tsx](react-vite-typescript/src/components/consent-bridge.tsx) passes the visitor's consent on every page load and whenever it changes.
+- [components/identity-bridge.tsx](react-vite-typescript/src/components/identity-bridge.tsx) identifies the connected wallet and calls `reset()` when it disconnects.
 
-## Integration
+[App.tsx](react-vite-typescript/src/App.tsx) captures a `signup` event. Everything in `src/demo` is scaffolding: the wallet providers, the cookie banner and the layout.
 
-[App.tsx](react-vite-typescript/src/App.tsx) creates one SDK instance per mounted
-app and identifies the address supplied by wagmi when the connected account changes:
+## Check it works
 
-```ts
-const specify = new Specify({ advertiserKey: yourAdvertiserKey });
-await specify.identify(connectedAddress);
-const status = await specify.capture("example_event");
-```
+Use a development key. Answer the cookie banner, then capture an event: in your browser's network panel, requests to `spfsrv.com/v1/identify` and `spfsrv.com/v1/events` return `200`. Development keys never record anything.
 
-[cookie-consent.tsx](react-vite-typescript/src/demo/cookie-consent.tsx) connects
-[CookieConsent's callbacks](https://cookieconsent.orestbida.com/reference/configuration-reference.html)
-to `specify.setCookieConsent(granted)` on initialization and whenever the saved
-choice changes. Before consent, identification and events stay in instance memory;
-granting consent sends them. Withdrawing consent pauses unsent requests.
-Connected wallets accumulate; disconnecting does not clear them.
-
-The SDK returns an HTTP status or `null`. This example displays `200` as accepted,
-other statuses as returned, and explains that calls before consent are buffered.
-See the [SDK documentation](https://www.npmjs.com/package/@specify-sh/advertiser-sdk) for
-user IDs, identity reset, event overrides, and server usage.
-
-The surrounding wallet providers and styling are demo scaffolding. The SDK uses
-neither wagmi nor React itself.
-
-## Check
-
-```sh
-cd react-vite-typescript
-bun run build
-```
-
-## Next.js + TypeScript example
-
-[nextjs-typescript](nextjs-typescript/README.md) demonstrates browser capture and
-a server-side purchase with the App Router. Both flows use `customer_123` and
-`NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY`. It includes CookieConsent synchronization,
-a Node.js Server Action, and setup and build instructions.
-
-## Node.js + TypeScript example
-
-[nodejs-typescript](nodejs-typescript/README.md) shows a server business operation
-that captures a `purchase` event for an explicit customer ID. It uses the same
-public default import and npm SDK dependency, builds TypeScript as ESM, and
-runs the compiled example with Node.js. Its README includes setup, commands,
-optional identification, explicit URLs, and tracking failure handling.
+Events wait until the visitor answers the banner. If they refuse, events are still sent, without Specify's cookie.

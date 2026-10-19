@@ -1,12 +1,10 @@
-# Node.js + TypeScript advertiser SDK example
+# Node.js + TypeScript
 
-A small ESM command that completes a purchase for an explicit customer ID, then
-captures a `purchase` event. Bun installs dependencies and runs build commands;
-Node.js executes the compiled JavaScript. Use Node.js 22 or newer and Bun.
+The [server events guide](https://docs.specify.sh/advertising/server) as a working Node.js command: it completes a purchase for a customer, then captures a `purchase` event.
 
-## Setup and run
+## Run it
 
-This example installs `@specify-sh/advertiser-sdk@latest` from npm.
+Requires Node.js 22+ and Bun.
 
 ```sh
 cd nodejs-typescript
@@ -14,82 +12,32 @@ bun install
 cp .env.example .env.local
 ```
 
-Set the empty `SPECIFY_ADVERTISER_KEY` value in `.env.local` to your organization's
-advertiser key. `.env.local` is ignored by Git. Node's
-[`--env-file`](https://nodejs.org/api/cli.html#--env-filefile) loads it; an existing
-shell environment variable takes precedence.
+Set `SPECIFY_ADVERTISER_KEY` in `.env.local`, then build and run:
 
 ```sh
-bun run types
 bun run build
 bun run start
 ```
 
-`start` runs `node --env-file=.env.local dist/index.js`, using `customer_123`.
-Supply your application's customer ID as the first argument:
+`start` uses the customer ID `customer_123`. Pass your own as an argument:
 
 ```sh
 node --env-file=.env.local dist/index.js customer_456
 ```
 
-## The SDK integration
+## The integration
 
-In [src/index.ts](src/index.ts), the purchase object and console output stand in
-for your existing checkout code. The SDK portion is the import, environment
-lookup, and these two lines after the business operation succeeds:
+In [src/index.ts](src/index.ts), the purchase object stands in for your checkout. Once the purchase succeeds, it captures the event:
 
 ```ts
-const specify = new Specify({ advertiserKey });
-const status = await specify.capture("purchase", customerId);
-```
-
-Pass the customer ID belonging to the current operation on every server call.
-The example keeps it in a function argument, with no shared current-user state.
-Server calls need no cookie consent and send without cookie credentials.
-
-Identification is optional and records no event. It does not select an identity
-for subsequent server calls, so capture still requires its own customer ID:
-
-```ts
-await specify.identify(customerId);
-await specify.capture("purchase", customerId);
-```
-
-To attach a URL, supply it explicitly:
-
-```ts
-await specify.capture("purchase", customerId, {
-  url: "https://shop.example/orders/123",
+await capture({
+  advertiserKey: process.env.SPECIFY_ADVERTISER_KEY ?? "",
+  event: "purchase",
+  identity: customerId,
+  dedupeKey: purchase.id,
 });
 ```
 
-Without that option, the request omits the URL and the service stores SQL `NULL`.
-Node has no page URL to infer.
-
-## Results and business failures
-
-`capture` and `identify` resolve to a numeric HTTP status or `null`. The current
-SDK passes through every received status, including `204`, without reading the
-response body. Common results are:
-
-| Result | Meaning |
-| --- | --- |
-| `200` | The service accepted the request. Development keys validate without persisting, so this alone does not prove storage. |
-| `400` | The service rejected the request or identity. |
-| `401` | The advertiser key was rejected. |
-| `429` | The service rate limit was exceeded. |
-| `503` | The service was unavailable or could not complete the request. |
-| `null` | No HTTP status was returned: local rejection/no-op, network failure, or timeout. |
-
-For example, a missing key or a server capture without identity returns `null`.
-A lost response does not establish whether an event was stored. The SDK contains
-tracking errors and attempts each request once; its current request timeout is
-60 seconds when `AbortController` is available.
-
-The purchase completes before tracking. This example logs the tracking result
-and returns the completed purchase regardless of that result. Do not turn a
-tracking status or `null` into a failed checkout or roll back the purchase.
-
-See the [SDK README](https://www.npmjs.com/package/@specify-sh/advertiser-sdk) for the
-full API. Internal verification and infrastructure tools belong in
-`advertiser-sdk-playground`.
+- `identity` is the same user ID your site passes to `identify()` in the browser. A server event only counts for a user your site has identified.
+- `dedupeKey` is the purchase ID, so a retry of the same purchase counts once.
+- `capture()` throws `ValidationError` before sending anything when an option is invalid, such as a missing key or an email address as the identity. The example logs the reason and still returns the completed purchase. It never throws because Specify is unreachable.

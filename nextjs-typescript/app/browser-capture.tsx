@@ -1,62 +1,44 @@
 "use client";
 
-import Specify from "@specify-sh/advertiser-sdk";
-import { useEffect, useState } from "react";
-import { CookieConsentControl } from "../demo/cookie-consent";
+import { useState } from "react";
+import { showConsentPreferences } from "../demo/consent";
+import { specify } from "../lib/specify";
 
-export function BrowserCapture({ customerId }: { customerId: string }) {
-  const [specify] = useState(
-    () =>
-      new Specify({
-        advertiserKey: process.env.NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY ?? "",
-      }),
-  );
-  const [pending, setPending] = useState(false);
-  const [result, setResult] = useState<number | null>();
+export function BrowserCapture() {
+  const [signups, setSignups] = useState(0);
 
-  useEffect(() => {
-    void specify.identify(customerId);
-  }, [customerId, specify]);
-
-  async function captureEvent() {
-    if (pending) return;
-
-    setPending(true);
-    setResult(undefined);
-    const status = await specify.capture("product_view");
-    setResult(status);
-    setPending(false);
+  function onSignup() {
+    specify.capture("signup");
+    setSignups((count) => count + 1);
   }
 
   return (
     <section className="flow" aria-labelledby="browser-title">
       <h2 id="browser-title">1. Capture in the browser</h2>
       <p>
-        Browser events include the customer ID and current page URL. Events wait
-        in memory until analytics consent is granted.
+        Browser events carry the customer ID and the current page URL. They wait
+        until you answer the cookie banner; if you refuse, they&apos;re still
+        sent, without Specify&apos;s cookie.
       </p>
-      <CookieConsentControl client={specify} />
-      <div className="interaction">
-        <code>product_view</code>
+      <div className="consent-row">
         <button
+          className="secondary"
           type="button"
-          onClick={captureEvent}
-          disabled={pending}
-          aria-busy={pending}
+          onClick={showConsentPreferences}
         >
-          {pending ? "Capturing…" : "Track product view"}
+          Cookie preferences
+        </button>
+      </div>
+      <div className="interaction">
+        <code>signup</code>
+        <button type="button" onClick={onSignup}>
+          Simulate a sign-up
         </button>
       </div>
       <p className="result" role="status" aria-live="polite">
-        {pending
-          ? "Waiting for the SDK response…"
-          : result === undefined
-            ? null
-            : result === 200
-              ? "Event accepted (HTTP 200)."
-              : result === null
-                ? "No HTTP response. The event may be buffered or could not be sent."
-                : `Capture returned HTTP ${result}.`}
+        {signups === 0
+          ? null
+          : `Captured ${signups} signup ${signups === 1 ? "event" : "events"}. Check the request to spfsrv.com/v1/events in your browser's network panel.`}
       </p>
     </section>
   );

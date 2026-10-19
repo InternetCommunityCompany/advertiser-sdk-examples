@@ -32,9 +32,9 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <div className="mt-6 border-t border-gray-700/50 pt-6">
             <p className="mt-2 text-sm leading-relaxed text-gray-400">
-              Connected wallets are remembered locally by the SDK, including
-              account changes. Disconnecting does not clear them. Calls before
-              consent stay in memory and are sent after consent is granted.
+              The SDK identifies each wallet you connect, and forgets them when
+              you disconnect. Events wait until you answer the cookie banner;
+              if you refuse, they're still sent, without Specify's cookie.
             </p>
 
             <div className="mt-6 space-y-5">{children}</div>

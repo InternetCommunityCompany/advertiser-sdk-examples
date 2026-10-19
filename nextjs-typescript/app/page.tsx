@@ -8,7 +8,7 @@ export default function Page() {
 
   return (
     <Layout customerId={customerId}>
-      <BrowserCapture customerId={customerId} />
+      <BrowserCapture />
       <PurchaseForm />
     </Layout>
   );

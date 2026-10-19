@@ -18,7 +18,7 @@ export function Layout({
         <article>
           <h1>Customer activity</h1>
           <p>
-            Track product views in the browser and purchases on the server.
+            Capture sign-ups in the browser and purchases on the server.
           </p>
           <div className="customer">
             <span>Customer ID</span>

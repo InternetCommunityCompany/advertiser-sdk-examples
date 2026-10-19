@@ -1,34 +1,19 @@
 # Next.js + TypeScript
 
-A small App Router integration: identify a customer and track a product view in
-the browser, then complete a purchase through a Node.js Server Action. The layout
-and CookieConsent integration follow the React example.
+The [Next.js guide](https://docs.specify.sh/advertising/nextjs) as a working App Router app: a sign-up captured in the browser, and a purchase captured on the server.
 
 ## Where to read
 
-Start with the SDK integration files:
+- [lib/specify.ts](lib/specify.ts) creates the browser client that Client Components share.
+- [components/specify-bridge.tsx](components/specify-bridge.tsx) passes the visitor's consent and identifies the customer. The [root layout](app/layout.tsx) renders it on every page.
+- [app/browser-capture.tsx](app/browser-capture.tsx) captures a `signup` event in the browser.
+- [app/actions.ts](app/actions.ts) completes a purchase in a Server Action, then captures it with the server entry, using the receipt ID as the `dedupeKey`.
 
-- [app/browser-capture.tsx](app/browser-capture.tsx): create the browser client,
-  identify the customer, and capture an event.
-- [demo/cookie-consent.tsx](demo/cookie-consent.tsx): own consent state,
-  synchronize it with the SDK, and manage consent UI setup and cleanup.
-- [app/actions.ts](app/actions.ts): resolve the customer on the server, complete
-  the purchase, and capture it with a separate server client.
+Everything in `demo/` is scaffolding: the cookie banner, the customer lookup, the layout and the purchase form. The customer ID is a placeholder, `customer_123`, which the server passes to both the browser and the Server Action.
 
-The example scaffolding lives in `demo/`, following the React example:
+## Run it
 
-| File | Responsibility |
-| --- | --- |
-| [cookie-consent.tsx](demo/cookie-consent.tsx) | Own consent state, synchronize it with the SDK, and manage consent UI setup and cleanup. |
-| [consent-config.ts](demo/consent-config.ts) | Consent categories and modal copy. |
-| [customer.ts](demo/customer.ts) | Server-only customer lookup. |
-| [layout.tsx](demo/layout.tsx) and [styles.css](demo/styles.css) | Page presentation. |
-| [purchase-form.tsx](demo/purchase-form.tsx) | Submit the Server Action and display pending/results. |
-
-## Setup and configuration
-
-Requires Node.js 20.9+ and Bun. Installs
-`@specify-sh/advertiser-sdk@latest` from npm.
+Requires Node.js 20.9+ and Bun.
 
 ```sh
 cd nextjs-typescript
@@ -36,103 +21,10 @@ bun install
 cp .env.example .env.local
 ```
 
-Fill in `.env.local`:
+Set `NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY` in `.env.local`. Advertiser keys are public, and the Server Action reads the same variable. Then run `bun run dev` and open [localhost:3001](http://localhost:3001).
 
-| Variable | Used by |
-| --- | --- |
-| `NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY` | Browser SDK and Server Action; public and embedded at build time. |
+## What to expect
 
-Missing keys produce `null` SDK results.
-Development keys validate calls without persisting events or identities.
-
-```sh
-bun run types
-bun run build
-bun run start
-```
-
-Open [localhost:3001](http://localhost:3001). For development, use `bun run dev`
-instead of `build` and `start`. Rebuild after
-changing public variables or the customer ID; the page is prerendered with that ID.
-
-## Browser capture
-
-[browser-capture.tsx](app/browser-capture.tsx) owns one SDK instance for its active
-mount. Customer ID changes call `identify()` on that same instance.
-The [consent control](demo/cookie-consent.tsx) owns consent state and setup,
-passing the initial choice and `onConsent`/`onChange` updates to the SDK's
-`setCookieConsent`. Cleanup pauses unsent requests and resets the consent UI
-without deleting its saved choice.
-Already dispatched requests may finish. There is no SDK destroy method.
-Event capture can run before the consent UI finishes initializing; the SDK
-buffers events until consent is granted.
-
-The essential calls are:
-
-```ts
-import Specify from "@specify-sh/advertiser-sdk";
-
-const specify = new Specify({
-  advertiserKey: process.env.NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY ?? "",
-});
-void specify.identify(customerId);
-specify.setCookieConsent(consentManagerAllowsAnalytics);
-// In the capture button's handler:
-const status = await specify.capture("product_view");
-```
-
-The current SDK starts with consent false. Identification remembers the customer
-locally, and captures before consent return `null` immediately and buffer a
-snapshot in instance memory. Granting consent sends pending identification and
-flushes buffered captures in order without waiting for identification. Withdrawal
-pauses unsent work. Reloading
-or discarding the instance loses its buffer. The original buffered result stays
-`null`; it does not become a delivery receipt later.
-
-Browser capture uses the complete current page URL and the customer ID. A Client
-Component can also render on the server, so SDK calls belong in effects and event
-handlers, never in its render function. Rendering, SSR, prerendering, and builds
-send no SDK requests.
-
-## Server purchase
-
-[actions.ts](app/actions.ts) exports a `"use server"` action. The
-[purchase form](demo/purchase-form.tsx) uses `useActionState` for pending/results.
-The action generates a receipt; no payment or durable order is created.
-
-```ts
-import Specify from "@specify-sh/advertiser-sdk";
-
-const customerId = getCustomerId();
-const purchaseId = crypto.randomUUID();
-const specify = new Specify({
-  advertiserKey: process.env.NEXT_PUBLIC_SPECIFY_ADVERTISER_KEY ?? "",
-});
-const status = await specify.capture("purchase", customerId);
-```
-
-Tracking runs after receipt creation, and tracking failure still returns the
-completed purchase because the SDK contains errors and returns `null`.
-The action constructs its own SDK instance. It passes identity explicitly,
-forwards no browser cookies, and supplies no event URL. Server calls require no
-cookie-consent setter. Calling `identify()` on a browser or server does not select
-the identity for a later server capture.
-
-The placeholder ID `customer_123` comes from `getCustomerId()` in
-[customer.ts](demo/customer.ts) on the server; the page passes it to the browser.
-
-## Results
-
-The SDK returns `Promise<number | null>`. This example labels only `200` as
-accepted and displays other numeric statuses as returned, including `204`.
-`400` means invalid input, `401` an invalid key, `403` missing browser consent,
-`429` a rate limit, and `503` an unavailable service. `null` can mean buffering,
-local rejection, missing configuration, a network failure, or no response.
-Neither an HTTP status nor `null` by itself proves whether an event was stored.
-The SDK attempts each request once and does not provide durable retries.
-
-See the [SDK documentation](https://www.npmjs.com/package/@specify-sh/advertiser-sdk)
-for the complete contract, and Next.js's official guides for
-[installation](https://nextjs.org/docs/app/getting-started/installation),
-[Server Action forms](https://nextjs.org/docs/app/guides/forms), and
-[environment variables](https://nextjs.org/docs/app/guides/environment-variables).
+- Browser events wait until you answer the cookie banner. If you refuse, they're still sent, without Specify's cookie.
+- With a development key, requests to `spfsrv.com/v1/identify` and `spfsrv.com/v1/events` return `200` in your browser's network panel. Development keys never record anything.
+- If the key is missing or invalid, the purchase still completes and shows why it wasn't sent to Specify. The server entry throws `ValidationError` for invalid input, and never fails because Specify is unreachable.

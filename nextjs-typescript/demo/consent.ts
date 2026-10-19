@@ -1,0 +1,57 @@
+import * as CookieConsent from "vanilla-cookieconsent";
+
+// A stand-in for your consent manager: CookieConsent calls onConsent with the
+// stored answer on every page load, and onChange when the visitor changes it.
+export function watchAdvertisingConsent(onAnswer: (granted: boolean) => void) {
+  const answer = () => onAnswer(CookieConsent.acceptedCategory("advertising"));
+
+  void CookieConsent.run({
+    categories: {
+      necessary: { enabled: true, readOnly: true },
+      advertising: {},
+    },
+    onConsent: answer,
+    onChange: answer,
+    language: {
+      default: "en",
+      translations: {
+        en: {
+          consentModal: {
+            title: "Allow advertising cookies?",
+            description:
+              "With your consent, Specify can set a cookie to connect this visit to the ad that brought you here.",
+            acceptAllBtn: "Allow",
+            acceptNecessaryBtn: "Refuse",
+            showPreferencesBtn: "Preferences",
+          },
+          preferencesModal: {
+            title: "Cookie preferences",
+            acceptAllBtn: "Allow all",
+            acceptNecessaryBtn: "Refuse all",
+            savePreferencesBtn: "Save preferences",
+            closeIconLabel: "Close preferences",
+            sections: [
+              {
+                title: "Necessary",
+                description: "Remembers your cookie choices.",
+                linkedCategory: "necessary",
+              },
+              {
+                title: "Advertising",
+                description:
+                  "Lets Specify set a cookie to measure which ads lead to purchases. You can withdraw consent at any time.",
+                linkedCategory: "advertising",
+              },
+            ],
+          },
+        },
+      },
+    },
+  });
+
+  return () => CookieConsent.reset();
+}
+
+export function showConsentPreferences() {
+  CookieConsent.showPreferences();
+}

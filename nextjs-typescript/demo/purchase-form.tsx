@@ -21,7 +21,7 @@ export function PurchaseForm() {
         </div>
         <div className="result" role="status" aria-live="polite">
           {pending ? (
-            <p>Completing the purchase and waiting for tracking…</p>
+            <p>Completing the purchase…</p>
           ) : result ? (
             <>
               <p>
@@ -29,11 +29,9 @@ export function PurchaseForm() {
                 <code>{result.purchaseId}</code>
               </p>
               <p>
-                {result.trackingStatus === 200
-                  ? "Tracking accepted (HTTP 200)."
-                  : result.trackingStatus === null
-                    ? "Tracking returned no HTTP response."
-                    : `Tracking returned HTTP ${result.trackingStatus}.`}
+                {result.trackingError
+                  ? `Not sent to Specify: ${result.trackingError}`
+                  : "Sent to Specify, with the receipt as its dedupeKey."}
               </p>
             </>
           ) : null}
