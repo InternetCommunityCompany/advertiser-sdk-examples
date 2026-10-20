@@ -1,22 +1,41 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import "vanilla-cookieconsent/dist/cookieconsent.css";
-import { SpecifyBridge } from "../components/specify-bridge";
-import { getCustomerId } from "../demo/customer";
-import "../demo/styles.css";
+import { Geist, Geist_Mono } from "next/font/google";
+
+import { ConsentBridge } from "@/components/consent-bridge";
+import { IdentityBridge } from "@/components/identity-bridge";
+import { Providers } from "@/components/providers";
+import { getCustomerId } from "@/lib/customer";
+
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "Specify Advertiser SDK · Next.js",
+  title: "Specify Advertiser SDK — Next.js example",
   description:
-    "Browser and server conversions with the Specify advertiser SDK.",
+    "Capture Specify conversions in the browser and from a Server Action",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en">
-      <body>
-        <SpecifyBridge customerId={getCustomerId()} />
-        {children}
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col">
+        <Providers>
+          <ConsentBridge />
+          <IdentityBridge customerId={getCustomerId()} />
+          {children}
+        </Providers>
       </body>
     </html>
   );
