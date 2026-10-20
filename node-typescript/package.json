@@ -1,22 +1,18 @@
 {
-  "name": "nodejs-typescript",
+  "name": "node-typescript",
   "private": true,
   "version": "0.0.0",
+  "description": "Capture a Specify advertiser conversion from Node.js with TypeScript",
   "type": "module",
-  "packageManager": "bun@1.3.14",
-  "engines": {
-    "node": ">=22"
-  },
   "scripts": {
-    "types": "tsc --noEmit",
-    "build": "tsc",
-    "start": "node --env-file=.env.local dist/index.js"
+    "start": "bun run index.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@specify-sh/advertiser-sdk": "latest"
+    "@specify-sh/advertiser-sdk": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22",
-    "typescript": "~5.7.2"
+    "@types/node": "^26.4.1",
+    "typescript": "~7.0.2"
   }
 }

@@ -1,43 +1,28 @@
-# Node.js + TypeScript
+# Node.js + TypeScript example
 
-The [server events guide](https://docs.specify.sh/advertising/server) as a working Node.js command: it completes a purchase for a customer, then captures a `purchase` event.
+A minimal advertiser integration using the [`@specify-sh/advertiser-sdk`](https://docs.specify.sh/advertising/server) server entry point. It completes a stand-in purchase, then captures it as a `purchase` event.
 
-## Run it
+## How to use
 
-Requires Node.js 22+ and Bun.
+Copy the environment template and set a development advertiser key and the customer's user ID:
 
 ```sh
-cd nodejs-typescript
+cp .env.example .env
+```
+
+Install dependencies and run the example:
+
+```sh
 bun install
-cp .env.example .env.local
+bun start
 ```
 
-Set `SPECIFY_ADVERTISER_KEY` in `.env.local`, then build and run:
+The script logs the completed purchase, then whether it was sent to Specify.
 
-```sh
-bun run build
-bun run start
-```
+## What it shows
 
-`start` uses the customer ID `customer_123`. Pass your own as an argument:
+**The same user ID** (`index.ts`) — `identity` is the user ID your site passes to `identify()` in the browser. A server event only counts for a user your site has identified; wallet addresses are the exception and count on their own.
 
-```sh
-node --env-file=.env.local dist/index.js customer_456
-```
+**Counting once** — `dedupeKey` is the purchase ID, so a retry of the same purchase counts once.
 
-## The integration
-
-In [src/index.ts](src/index.ts), the purchase object stands in for your checkout. Once the purchase succeeds, it captures the event:
-
-```ts
-await capture({
-  advertiserKey: process.env.SPECIFY_ADVERTISER_KEY ?? "",
-  event: "purchase",
-  identity: customerId,
-  dedupeKey: purchase.id,
-});
-```
-
-- `identity` is the same user ID your site passes to `identify()` in the browser. A server event only counts for a user your site has identified.
-- `dedupeKey` is the purchase ID, so a retry of the same purchase counts once.
-- `capture()` throws `ValidationError` before sending anything when an option is invalid, such as a missing key or an email address as the identity. The example logs the reason and still returns the completed purchase. It never throws because Specify is unreachable.
+**Errors** — `capture()` throws `ValidationError` before sending anything when an option is invalid, such as a malformed key or an email address as the identity. The example logs why and keeps the completed purchase. It never throws because Specify is unreachable.
