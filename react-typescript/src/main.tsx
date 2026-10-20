@@ -1,13 +1,35 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
+import { CookieManager } from "react-cookie-manager";
 import { createRoot } from "react-dom/client";
-import App from "./App";
-import { Web3Provider } from "./demo/web3-provider";
+import { WagmiProvider } from "wagmi";
+
+import { App } from "./app";
+import { wagmiConfig } from "./wagmi";
 import "./index.css";
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Web3Provider>
-      <App />
-    </Web3Provider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <CookieManager
+          cookieKey="specify-ads-consent"
+          showManageButton
+          cookieCategories={{
+            Analytics: false,
+            Social: false,
+            Advertising: true,
+          }}
+          translations={{
+            title: "Cookies",
+            message: "We use a cookie to measure which ads bring people here.",
+          }}
+        >
+          <App />
+        </CookieManager>
+      </QueryClientProvider>
+    </WagmiProvider>
   </StrictMode>,
 );
