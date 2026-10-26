@@ -11,6 +11,14 @@ export function configureConsent(
   }
 
   return CookieConsent.run({
+    guiOptions: {
+      consentModal: {
+        layout: "box inline",
+        position: "bottom left",
+        equalWeightButtons: false,
+      },
+      preferencesModal: { equalWeightButtons: false },
+    },
     categories: {
       necessary: { enabled: true, readOnly: true },
       [ADS_CATEGORY]: {},
@@ -22,20 +30,24 @@ export function configureConsent(
           consentModal: {
             title: "Cookies",
             description:
-              "We use a cookie to measure which ads bring visitors to this site.",
+              "We use a cookie to measure which ads bring people here.",
             acceptAllBtn: "Accept",
-            acceptNecessaryBtn: "Reject",
-            showPreferencesBtn: "Manage",
+            acceptNecessaryBtn: "Decline",
+            showPreferencesBtn: "Manage Cookies",
           },
           preferencesModal: {
-            title: "Preferences",
+            title: "Cookie Preferences",
             acceptAllBtn: "Accept all",
             acceptNecessaryBtn: "Reject all",
-            savePreferencesBtn: "Save",
+            savePreferencesBtn: "Save Preferences",
             closeIconLabel: "Close",
             sections: [
               {
-                title: "Strictly necessary",
+                description:
+                  "Manage your cookie preferences below. Essential cookies are always enabled as they are necessary for the website to function properly.",
+              },
+              {
+                title: "Essential",
                 description: "Required for the site to work.",
                 linkedCategory: "necessary",
               },

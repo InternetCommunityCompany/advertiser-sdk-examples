@@ -20,32 +20,36 @@
       height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <main class="mx-auto flex max-w-md flex-col gap-6 p-8">
-      <h1 class="text-lg font-semibold">Specify through Google Tag Manager</h1>
+      <h1 class="text-lg font-semibold">Specify advertiser SDK</h1>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <button
-          id="connect"
-          type="button"
-          class="rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
-        >
-          Connect wallet
-        </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex min-w-0 flex-col gap-1">
+          <button
+            id="connect"
+            type="button"
+            class="rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            Connect wallet
+          </button>
+          <p id="account" class="break-words text-sm text-slate-500 empty:hidden"></p>
+        </div>
         <button id="preferences" type="button" class="text-sm underline">
           Consent
         </button>
       </div>
 
-      <p id="account" class="font-mono text-xs text-slate-500"></p>
-
-      <button
-        id="signup"
-        type="button"
-        class="self-start rounded border border-slate-300 px-3 py-2 text-sm font-medium disabled:opacity-50"
-      >
-        Sign up
-      </button>
-
-      <p id="status" class="text-sm text-slate-500"></p>
+      <div class="flex flex-col gap-2">
+        <button
+          id="signup"
+          type="button"
+          class="self-start rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+        >
+          Sign up
+        </button>
+        <p id="status" role="status" class="text-sm text-slate-500">
+          No sign-ups queued yet.
+        </p>
+      </div>
     </main>
 
     <script type="module" src="/src/main.ts"></script>
